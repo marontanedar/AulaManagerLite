@@ -24,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'rol_id',
     ];
     protected $dateFormat = 'U';
     protected $dates = [
@@ -57,5 +58,16 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'rol_id', 'rol_id');
+    }
+
+    public function incidences()
+    {
+        return $this->hasMany(Incidences::class, 'user_id', 'user_id');
+        return $x;
     }
 }
