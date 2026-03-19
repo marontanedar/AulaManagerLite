@@ -1,0 +1,59 @@
+#docker-compose.yml
+#version: '3'
+services:
+    nginx:
+        container_name: nginx-laravel
+        image: nginx:1.17.8
+        command: [ "nginx", "-g", "daemon off;" ]
+        depends_on:
+            - app
+        links:
+            - app
+        working_dir: /var/www/html
+        volumes:
+            - ./docker/nginx/asset/:/etc/nginx/conf.d/
+            - ./docker/nginx/log:/var/log/nginx/:rw
+            - ./:/var/www/html:rw
+        ports:
+            - "8080:80"
+        logging:
+            options:
+                max-size: "1m"
+                max-file: "3"
+        networks:
+            - local-network
+    app:
+        container_name: app-laravel
+        build: ./docker/php
+        working_dir: /var/www/html
+        links:
+            - db
+        depends_on:
+            - db
+        volumes:
+            - ./:/var/www/html:rw
+        command: bash -c "php-fpm"
+        logging:
+            options:
+                max-size: "1m"
+                max-file: "3"
+        networks:
+            - local-network
+    db:
+        container_name: db-laravel-mysql
+        image: mysql:8.0
+        volumes:
+            - './dbdata_aula:/var/lib/mysql'
+        ports:
+            - 3310:3306
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: aulamanager_lite
+        restart: always
+        logging:
+            driver: none
+        networks:
+            - local-network
+
+networks:
+    local-network:

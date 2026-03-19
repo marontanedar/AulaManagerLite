@@ -1,0 +1,26 @@
+# Dependencias de PHP (Lo más pesado de tu lista)
+/vendor/
+/vendor/**
+/node_modules/
+
+# Docker y Temporales
+.docker/
+*.log
+.DS_Store
+Thumbs.db
+
+# Configuración de entorno (Seguridad)
+.env
+.env.backup
+
+
+# Herramientas de desarrollo
+.vscode/
+.idea/
+
+# Si usas bases de datos locales
+docker/db_data/
+dbdata_aula/
+/dbdata_aula/
+**/dbdata_aula/**
+*.sock
