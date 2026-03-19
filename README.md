@@ -8,5 +8,4 @@
 
 ## URL 
 - Web : `http://localhost:8080`
-- DB / Mysql : `http://localhost:27018`
-dpcker
+- Mysql : `http://localhost:27018`
