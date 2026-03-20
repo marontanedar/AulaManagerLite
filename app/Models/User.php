@@ -16,7 +16,7 @@ class User extends Authenticatable
     use Notifiable;
 
     protected $table = 'users';
-    protected $primaryKey = 'users_id';
+    protected $primaryKey = 'user_id';
 
     /**
      * The attributes that are mass assignable.
@@ -28,12 +28,6 @@ class User extends Authenticatable
         'email',
         'password',
         'rol_id',
-    ];
-    protected $dateFormat = 'U';
-    protected $dates = [
-        'created_at',
-        'updated_at',
-        'deleted_at',
     ];
 
     /**
