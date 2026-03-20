@@ -15,6 +15,9 @@ class User extends Authenticatable
     use HasFactory;
     use Notifiable;
 
+    protected $table = 'users';
+    protected $primaryKey = 'user_id';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -25,12 +28,6 @@ class User extends Authenticatable
         'email',
         'password',
         'rol_id',
-    ];
-    protected $dateFormat = 'U';
-    protected $dates = [
-        'created_at',
-        'updated_at',
-        'deleted_at',
     ];
 
     /**
@@ -55,10 +52,10 @@ class User extends Authenticatable
     /**
      * Get user's orders
      */
-    public function orders()
-    {
-        return $this->hasMany(Order::class);
-    }
+    // public function orders()
+    // {
+    //     return $this->hasMany(Order::class);
+    // }
 
     public function role()
     {
@@ -67,7 +64,6 @@ class User extends Authenticatable
 
     public function incidences()
     {
-        return $this->hasMany(Incidences::class, 'user_id', 'user_id');
-        return $x;
+        return $this->hasMany(Incidence::class, 'user_id', 'user_id');
     }
 }
