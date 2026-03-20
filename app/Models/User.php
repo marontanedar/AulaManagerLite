@@ -68,6 +68,5 @@ class User extends Authenticatable
     public function incidences()
     {
         return $this->hasMany(Incidences::class, 'user_id', 'user_id');
-        return $x;
     }
 }
