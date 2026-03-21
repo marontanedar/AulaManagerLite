@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\IncidenceController;
+use App\Http\Controllers\ResourceController;
+use App\Models\Reservation;
+use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +17,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+Route::get('/reservations', function () {
+    return "Construction";
+})->name('reservation.index');
+
+//Route::middleware(['auth'])->group(function () {
+    Route::resource('resources', ResourceController::class);
+    Route::resource('incidences', IncidenceController::class);
+//});
