@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\IncidenceController;
 use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\AuthController;
 use App\Models\Reservation;
 use GuzzleHttp\Middleware;
@@ -33,6 +34,7 @@ Route::middleware(['guest'])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::resource('resources', ResourceController::class);
