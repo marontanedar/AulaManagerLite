@@ -34,13 +34,12 @@ Route::middleware(['guest'])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::resource('resources', ResourceController::class);
-    Route::resource('incidences', IncidenceController::class);
+    Route::get('/', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
 
-    Route::get('/reservations', function () {
-        return "Reservas";
-    })->name('reservations.index');
+    Route::resource('resources', ResourceController::class);
+    // Route::resource('incidences', IncidenceController::class);
 });
