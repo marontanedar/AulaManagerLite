@@ -14,21 +14,25 @@ class ReservationController extends Controller
     {
         $categories = Category::all();
 
-        $hours = [];
-        $inicio = 8;
-        $fin = 20;
+        $date = $request->get('date', date('Y-m-d'));
 
-        for ($i = $inicio; $i <= $fin; $i++) {
+        $hours = [];
+        $apertura = 8;
+        $cierre = 21;
+
+        for ($i = $apertura; $i <= $cierre; $i++) {
             $hours[] = sprintf('%02d:00', $i);
         }
 
-        $query = Resource::query();
-        if ($request->has('category')) {
-            $query->where('category_id', $request->category);
-        }
-        $resources = $query->get();
+        $resources = Resource::with(['reservations' => function ($q) use ($date) {
+            $q->where('date_reservation', $date);
+        }])
+        ->when($request->category, function ($query, $categoryId) {
+            return $query->where('category_id', $categoryId);
+        })
+        ->get();
 
-        return view('reservations.index', compact('categories', 'hours', 'resources'));
+        return view('reservations.index', compact('categories', 'hours', 'resources', 'date'));
     }
 
     public function store(Request $request)
@@ -36,19 +40,24 @@ class ReservationController extends Controller
         $request->validate([
             'resource_id' => 'required|exists:resources,resource_id',
             'date_reservation' => 'required|date',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
+            'start_time' => 'required', // Formato H:i desde el modal
+            'end_time' => 'required|after:start_time',
         ]);
 
-        $exists = Reservation::where('resource_id', $request->resource_id)
+        // Validación de solapamiento (Overlap)
+        $overlap = Reservation::where('resource_id', $request->resource_id)
             ->where('date_reservation', $request->date_reservation)
-            ->where(function ($query) use ($request) {
-                $query->whereBetween('start_time', [$request->start_time, $request->end_time])
-                      ->orWhereBetween('end_time', [$request->start_time, $request->end_time]);
+            ->where(function ($q) use ($request) {
+                $q->whereBetween('start_time', [$request->start_time, $request->end_time])
+                  ->orWhereBetween('end_time', [$request->start_time, $request->end_time])
+                  ->orWhere(function ($q2) use ($request) {
+                      $q2->where('start_time', '<=', $request->start_time)
+                         ->where('end_time', '>=', $request->end_time);
+                  });
             })->exists();
 
-        if ($exists) {
-            return back()->withErrors(['overloop' => 'El recurso ya está ocupado en ese intervalo exacto.']);
+        if ($overlap) {
+            return back()->withErrors(['msg' => 'Ya existe una reserva que choca con este horario.']);
         }
 
         Reservation::create([
@@ -57,9 +66,9 @@ class ReservationController extends Controller
             'date_reservation' => $request->date_reservation,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
-            'remarks' => $request->remarks,
+            'remarks' => $request->remarks
         ]);
 
-        return back()->with('success', 'Reserva realizada con éxito.');
+        return back()->with('success', '¡Reserva guardada con éxito!');
     }
 }
