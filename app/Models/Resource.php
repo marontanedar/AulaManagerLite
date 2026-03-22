@@ -13,6 +13,11 @@ class Resource extends Model
     protected $primaryKey = 'resource_id';
     protected $fillable = ['name', 'description', 'status', 'category_id', 'created_by', 'updated_by'];
 
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'resource_id', 'resource_id');
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id', 'category_id');
