@@ -25,7 +25,7 @@ class ReservationController extends Controller
         }
 
         $resources = Resource::with(['reservations' => function ($q) use ($date) {
-            $q->where('date_reservation', $date);
+            $q->where('date', $date);
         }])
         ->when($request->category, function ($query, $categoryId) {
             return $query->where('category_id', $categoryId);
@@ -38,35 +38,31 @@ class ReservationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'resource_id' => 'required|exists:resources,resource_id',
-            'date_reservation' => 'required|date',
-            'start_time' => 'required', // Formato H:i desde el modal
-            'end_time' => 'required|after:start_time',
+            'resource_id'  => 'required|exists:resources,resource_id',
+            'date'         => 'required|date',
+            'start'        => 'required', // Formato H:i desde el modal
+            'end'          => 'required|after:start',
         ]);
 
         // Validación de solapamiento (Overlap)
-        $overlap = Reservation::where('resource_id', $request->resource_id)
-            ->where('date_reservation', $request->date_reservation)
+         $exists = Reservation::where('resource_id', $request->resource_id)
+            ->where('date', $request->date)
             ->where(function ($q) use ($request) {
-                $q->whereBetween('start_time', [$request->start_time, $request->end_time])
-                  ->orWhereBetween('end_time', [$request->start_time, $request->end_time])
-                  ->orWhere(function ($q2) use ($request) {
-                      $q2->where('start_time', '<=', $request->start_time)
-                         ->where('end_time', '>=', $request->end_time);
-                  });
+                $q->where('start', '<', $request->end)
+                ->where('end', '>', $request->start);
             })->exists();
 
-        if ($overlap) {
+        if ($exists) {
             return back()->withErrors(['msg' => 'Ya existe una reserva que choca con este horario.']);
         }
 
         Reservation::create([
-            'user_id' => auth()->id(),
+            'user_id'     => auth()->id(),
             'resource_id' => $request->resource_id,
-            'date_reservation' => $request->date_reservation,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'remarks' => $request->remarks
+            'date'        => $request->date,
+            'start'       => $request->start,
+            'end'         => $request->end,
+            'remarks'     => $request->remarks
         ]);
 
         return back()->with('success', '¡Reserva guardada con éxito!');

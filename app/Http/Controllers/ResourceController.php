@@ -27,7 +27,7 @@ class ResourceController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('resource.create', compact('categories'));
+        return view('resources.create', compact('categories'));
     }
 
     /**
@@ -39,19 +39,20 @@ class ResourceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:8',
-            'category_id' => 'required|exists:categories, category_id',
+            'name'        => 'required|string|max:50',
+            'category_id' => 'required|exists:categories,category_id',
+            'status'      => 'required|in:1,2,3',
         ]);
 
         Resource::create([
-            'name' => $request->name,
+            'name'        => $request->name,
             'description' => $request->description,
             'category_id' => $request->category_id,
-            'status' => 1,
-            'created_by' => auth()->id(),
+            'status'      => $request->status,
+            'created_by'  => auth()->id(),
         ]);
 
-        return redirect()->route('resource.index')->with('success', 'Recurso creado.');
+        return redirect()->route('resources.index')->with('success', 'Recurso creado.');
     }
 
     /**
@@ -73,7 +74,9 @@ class ResourceController extends Controller
      */
     public function edit($id)
     {
-        //
+        $resource = Resource::findOrFail($id);
+        $categories = Category::all();
+        return view('resources.edit', compact("resource", 'categories'));
     }
 
     /**
@@ -85,7 +88,17 @@ class ResourceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name'        => 'required|string|max:50',
+            'category_id' => 'required|exists:categories,category_id',
+            'status'      => 'required|in:1,2,3',
+        ]);
+
+        $resource = Resource::findOrFail($id);
+
+        $resource->update($request->all());
+
+        return redirect()->route('resources.index')->with('success', 'Recurso actualizado');
     }
 
     /**
@@ -96,6 +109,9 @@ class ResourceController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $resource = Resource::findOrFail($id);
+        $resource->delete();
+
+        return redirect()->route('resources.index')->with('success', 'Recurso eliminado');
     }
 }

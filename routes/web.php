@@ -1,11 +1,9 @@
 <?php
 
-use App\Http\Controllers\IncidenceController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\AuthController;
-use App\Models\Reservation;
-use GuzzleHttp\Middleware;
+use App\Http\Controllers\IncidenceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,19 +25,29 @@ use Illuminate\Support\Facades\Route;
 //     return "Construction";
 // })->name('reservation.index');
 
-
+//Sin autenticar usuario
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name(('login'));
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+
+    Route::get('/', function () {
+        return redirect()->route('login');
+    });
 });
 
+//Funciona si estoy autenticado
 Route::middleware(['auth'])->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+    //Calendario de reservas
     Route::get('/', [ReservationController::class, 'index'])->name('reservations.index');
-    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
 
+    //Recursos
     Route::resource('resources', ResourceController::class);
-    // Route::resource('incidences', IncidenceController::class);
+
+    //Incidencias
+    Route::resource('incidences', IncidenceController::class);
+
+    //Logout
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

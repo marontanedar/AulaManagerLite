@@ -11,7 +11,7 @@ class Reservation extends Model
 
     protected $table = 'reservations';
     protected $primaryKey = 'reservation_id';
-    protected $fillable = ['user_id', 'resource_id', 'date', 'begin', 'end'];
+    protected $fillable = ['user_id', 'resource_id', 'date', 'start', 'end'];
 
     public function user()
     {
