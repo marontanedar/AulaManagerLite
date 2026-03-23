@@ -23,7 +23,7 @@ class CreateTableReservations extends Migration
             $table->foreign("resource_id")->references("resource_id")->on("resources");
 
             $table->dateTime("date");
-            $table->time("begin");
+            $table->time("start");
             $table->time("end");
 
             $table->timestamps();

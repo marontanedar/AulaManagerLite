@@ -8,4 +8,4 @@
 
 ## URL 
 - Web : `http://localhost:8080`
-- Mysql : `http://localhost:27018`
+- Mysql : `http://127.0.0.1:3310`
