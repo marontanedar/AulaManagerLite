@@ -24,10 +24,11 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/reservations', function () {
 //     return "Construction";
 // })->name('reservation.index');
+Route::redirect('/home', '/');
 
 //Sin autenticar usuario
 Route::middleware(['guest'])->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name(('login'));
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
     Route::get('/', function () {
