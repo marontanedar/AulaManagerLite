@@ -89,7 +89,7 @@ class ResourceController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name'        => 'required|string|max:50',
+            'name'        => 'required|string|max:255',
             'category_id' => 'required|exists:categories,category_id',
             'status'      => 'required|in:1,2,3',
         ]);
