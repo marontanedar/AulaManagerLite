@@ -2,34 +2,33 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-12">
-        <div class="main-card border border-dark bg-white shadow-sm p-4 mx-auto" style="max-width: 700px;">
-            
-            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-dark pb-2">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="card-panel">
+            <div class="section-header">
                 <div>
-                    <h5 class="fw-bold text-uppercase m-0" style="letter-spacing: 1px;">Nuevo Recurso</h5>
-                    <small class="text-muted text-uppercase" style="font-size: 0.65rem;">Añadir elemento al inventario</small>
+                    <h5 class="section-title">Nuevo Recurso</h5>
+                    <p class="section-subtitle">Añadir al inventario</p>
                 </div>
-                <a href="{{ route('resources.index') }}" class="btn btn-sm btn-outline-dark text-uppercase fw-bold rounded-0">Volver</a>
+                <a href="{{ route('resources.index') }}" class="btn btn-outline-dark btn-sm">← Volver</a>
             </div>
 
             <form action="{{ route('resources.store') }}" method="POST">
                 @csrf
 
                 <div class="mb-3">
-                    <label for="name" class="fw-bold text-uppercase mb-1" style="font-size: 0.75rem;">Nombre del Recurso / Aula:</label>
-                    <input type="text" name="name" id="name" 
-                           class="form-control border-dark rounded-0 fw-bold" 
-                           placeholder="Ej: AULA 202, PROYECTOR EPSON..."
+                    <label class="form-label-upper">Nombre del recurso / aula</label>
+                    <input type="text" name="name" class="form-control"
+                           placeholder="Ej: Aula 202, Proyector Epson..."
                            value="{{ old('name') }}" required>
                 </div>
 
                 <div class="mb-3">
-                    <label for="category_id" class="fw-bold text-uppercase mb-1" style="font-size: 0.75rem;">Categoría:</label>
-                    <select name="category_id" id="category_id" class="form-select border-dark rounded-0 fw-bold" required>
-                        <option value="">Selecciona una categoría...</option>
+                    <label class="form-label-upper">Categoría</label>
+                    <select name="category_id" class="form-select" required>
+                        <option value="">Selecciona...</option>
                         @foreach($categories as $category)
-                            <option value="{{ $category->category_id }}" {{ old('category_id') == $category->category_id ? 'selected' : '' }}>
+                            <option value="{{ $category->category_id }}"
+                                {{ old('category_id') == $category->category_id ? 'selected' : '' }}>
                                 {{ $category->name }}
                             </option>
                         @endforeach
@@ -37,30 +36,34 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="fw-bold text-uppercase mb-1" style="font-size: 0.75rem;">Estado Inicial:</label>
-                    <div class="d-flex gap-4 p-2 border border-dark bg-light">
-                        <div class="form-check">
-                            <input class="form-check-input border-dark" type="radio" name="status" id="status1" value="1" {{ old('status', '1') == 1 ? 'checked' : '' }}>
-                            <label class="form-check-label small fw-bold text-success" for="status1">● DISPONIBLE</label>
+                    <label class="form-label-upper">Estado inicial</label>
+                    <div class="d-flex gap-3 p-2" style="background:#f5f5f5; border:1.5px solid #111;">
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" type="radio" name="status" id="s1" value="1"
+                                   {{ old('status','1') == '1' ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold text-success" style="font-size:0.7rem;" for="s1">● Disponible</label>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input border-dark" type="radio" name="status" id="status3" value="3" {{ old('status') == 3 ? 'checked' : '' }}>
-                            <label class="form-check-label small fw-bold text-warning" for="status3">● AVERIADO</label>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" type="radio" name="status" id="s2" value="2"
+                                   {{ old('status') == '2' ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold" style="font-size:0.7rem; color:#e6a817;" for="s2">● Mantenimiento</label>
+                        </div>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" type="radio" name="status" id="s3" value="3"
+                                   {{ old('status') == '3' ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold text-danger" style="font-size:0.7rem;" for="s3">● Fuera de servicio</label>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label for="description" class="fw-bold text-uppercase mb-1" style="font-size: 0.75rem;">Descripción (Opcional):</label>
-                    <textarea name="description" id="description" rows="3" 
-                              class="form-control border-dark rounded-0"
+                    <label class="form-label-upper">Descripción (opcional)</label>
+                    <textarea name="description" class="form-control" rows="3"
                               placeholder="Detalles adicionales...">{{ old('description') }}</textarea>
                 </div>
 
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-dark text-uppercase fw-bold py-2 rounded-0 shadow-sm">
-                        CREAR RECURSO
-                    </button>
+                    <button type="submit" class="btn btn-dark py-2">Crear Recurso</button>
                 </div>
             </form>
         </div>
