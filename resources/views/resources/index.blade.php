@@ -1,71 +1,74 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="main-card p-4 border border-dark bg-white shadow-sm">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="text-uppercase fw-bold m-0">Gestión de Recursos</h4>
-        <a href="{{ route('resources.create') }}" class="btn btn-dark rounded-0 text-uppercase fw-bold">
-            + Nuevo Recurso
+<div class="card-panel">
+    <div class="section-header">
+        <div>
+            <h5 class="section-title">Gestión de Recursos</h5>
+            <p class="section-subtitle">Inventario de aulas y equipamiento</p>
+        </div>
+        <a href="{{ route('resources.create') }}" class="btn btn-dark btn-sm">
+            <i class="bi bi-plus me-1"></i>Nuevo Recurso
         </a>
     </div>
 
-    @if(session('success'))
-        <div class="alert alert-success rounded-0 border-dark small fw-bold text-uppercase">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    <table class="table table-bordered align-middle">
-        <thead class="table-light text-center">
-            <tr class="border-dark">
-                <th class="border-dark" style="width: 50px;">ID</th>
-                <th class="border-dark">NOMBRE</th>
-                <th class="border-dark">CATEGORÍA</th>
-                <th class="border-dark">ESTADO</th>
-                <th class="border-dark">CREADOR</th>
-                <th class="border-dark">ACCIONES</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($resources as $res)
-            <tr>
-                <td class="text-center small">{{ $res->resource_id }}</td>
-                <td class="fw-bold">{{ $res->name }}</td>
-                <td class="text-center">
-                    <span class="badge border border-dark text-dark rounded-0 small">
-                        {{ $res->category->name }}
-                    </span>
-                </td>
-                <td class="text-center">
-                    @if($res->status == 1)
-                        <span class="text-success fw-bold small text-uppercase">● Disponible</span>
-                    @elseif($res->status == 3)
-                        <span class="text-danger fw-bold small text-uppercase">■ Averiado</span>
-                    @else
-                        <span class="text-warning fw-bold small text-uppercase">○ Reservado</span>
-                    @endif
-                </td>
-                <td class="small">{{ $res->creator->name ?? 'Sistema' }}</td>
-                <td class="text-center">
-                    <div class="btn-group">
-                        <a href="{{ route('resources.edit', $res->resource_id) }}" class="btn btn-sm btn-outline-dark rounded-0">Editar</a>
-                        <form action="{{ route('resources.destroy', $res->resource_id) }}" method="POST" 
-                            onsubmit="return confirm('¿Estás seguro de eliminar este recurso? Esta acción no se puede deshacer.')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger rounded-0 text-uppercase fw-bold">
-                                Eliminar
-                            </button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="6" class="text-center py-4 text-muted">No hay recursos registrados.</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover table-bordered m-0">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width:50px;">ID</th>
+                    <th>Nombre</th>
+                    <th style="width:140px;">Categoría</th>
+                    <th style="width:130px;" class="text-center">Estado</th>
+                    <th style="width:130px;">Creador</th>
+                    <th style="width:150px;" class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($resources as $resource)
+                    <tr>
+                        <td class="text-center text-muted">{{ $resource->resource_id }}</td>
+                        <td class="fw-bold text-uppercase">{{ $resource->name }}</td>
+                        <td>
+                            <span style="border:1px solid #ccc; padding:1px 7px; font-size:0.6rem; text-transform:uppercase; background:#fafafa;">
+                                {{ $resource->category->name ?? '—' }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            @if($resource->status == 1)
+                                <span class="badge-status badge-disponible">● Disponible</span>
+                            @elseif($resource->status == 2)
+                                <span class="badge-status badge-mantenimiento">● Mantenimiento</span>
+                            @else
+                                <span class="badge-status badge-averiado">● Fuera de servicio</span>
+                            @endif
+                        </td>
+                        <td class="text-muted text-uppercase" style="font-size:0.65rem;">
+                            {{ $resource->creator->name ?? '—' }}
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex gap-1 justify-content-center">
+                                <a href="{{ route('resources.edit', $resource->resource_id) }}"
+                                   class="btn btn-outline-dark btn-sm py-0 px-2">Editar</a>
+                                <form action="{{ route('resources.destroy', $resource->resource_id) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('¿Eliminar este recurso?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger py-0 px-2">Eliminar</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted text-uppercase" style="font-size:0.75rem;">
+                            No hay recursos registrados.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection

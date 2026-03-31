@@ -63,7 +63,11 @@ class ResourceController extends Controller
      */
     public function show($id)
     {
-        //
+        // $resource = Resource::with('category', 'creator', 'incidences', 'reservations')
+        //             ->where('resource_id', $id)
+        //             ->findOrFail($id);
+
+        return redirect()->route('resources.edit', $id);
     }
 
     /**
@@ -89,16 +93,22 @@ class ResourceController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name'        => 'required|string|max:50',
+            'name'        => 'required|string|max:255',
             'category_id' => 'required|exists:categories,category_id',
             'status'      => 'required|in:1,2,3',
         ]);
 
         $resource = Resource::findOrFail($id);
 
-        $resource->update($request->all());
+        $resource->update([
+            'name'        => $request->name,
+            'description' => $request->description ?? '',
+            'category_id' => $request->category_id,
+            'status'      => $request->status,
+            'updated_by'  => auth()->id(),
+        ]);
 
-        return redirect()->route('resources.index')->with('success', 'Recurso actualizado');
+        return redirect()->route('resources.index')->with('success', 'Recurso actualizado.');
     }
 
     /**

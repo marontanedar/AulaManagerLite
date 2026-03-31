@@ -16,7 +16,7 @@ class CreateTableResources extends Migration
         Schema::create('resources', function (Blueprint $table) {
             $table->bigIncrements("resource_id");
             $table->string("name");
-            $table->string("description");
+            $table->string("description")->nullable();
 
             //Estado recurso: 1 disponible, 2 mantenimiento, 3 fuera de servicio
             $table->tinyInteger("status")->default(1);

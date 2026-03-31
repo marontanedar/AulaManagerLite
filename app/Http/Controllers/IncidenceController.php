@@ -37,7 +37,7 @@ class IncidenceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'resource_id' => 'required|exists:resources, resource_id',
+            'resource_id' => 'required|exists:resources,resource_id',
             'description' => 'required|string',
         ]);
 

@@ -15,7 +15,7 @@ class User extends Authenticatable
     use HasFactory;
     use Notifiable;
 
-    protected $table = 'users';
+    //protected $table = 'users'; //No es necesario declarar
     protected $primaryKey = 'user_id';
 
     /**
@@ -49,21 +49,42 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    /**
-     * Get user's orders
-     */
-    // public function orders()
-    // {
-    //     return $this->hasMany(Order::class);
-    // }
 
+    // Relaciones
+
+    // Pertenece a un rol
     public function role()
     {
         return $this->belongsTo(Role::class, 'rol_id', 'rol_id');
     }
 
+    // Incidencias reportadas por un usuario
     public function incidences()
     {
         return $this->hasMany(Incidence::class, 'user_id', 'user_id');
+    }
+
+    // Reservas hechas por este usuario
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'user_id', 'user_id');
+    }
+
+    // Recursos creados
+    public function createdResources()
+    {
+        return $this->hasMany(Resource::class, 'created_by', 'user_id');
+    }
+
+    // Recursos actualizados
+    public function updatedResources()
+    {
+        return $this->hasMany(Resource::class, 'updated_by', 'user_id');
+    }
+
+    // Es admin?
+    public function isAdmin(): bool
+    {
+        return $this->role && $this->role->admin === true;
     }
 }
