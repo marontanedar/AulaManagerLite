@@ -32,6 +32,9 @@ services:
             - db
         volumes:
             - ./:/var/www/html:rw
+            - /var/www/html/vendor
+            - /var/www/html/node_modules
+            - /var/www/html/storage
         command: bash -c "php-fpm"
         logging:
             options:
