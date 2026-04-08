@@ -44,9 +44,9 @@
                             {{ \Illuminate\Support\Str::limit($incidence->description, 60) }}
                         </td>
                         <td class="text-center">
-                            @if($incidence->status)
+                            @if($incidence->status ==3)
                                 <span class="badge-status badge-disponible">● Resuelta</span>
-                            @else
+                            @else($incidence->status)
                                 <span class="badge-status badge-averiado">● Pendiente</span>
                             @endif
                         </td>
@@ -56,7 +56,7 @@
                                    class="btn btn-outline-dark btn-sm py-0 px-2">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                @if(auth()->user()->isAdmin() && !$incidence->status)
+                                @if(auth()->user()->isAdmin() && $incidence->status != 3)
                                     <a href="{{ route('incidences.edit', $incidence->incidence_id) }}"
                                        class="btn btn-dark btn-sm py-0 px-2">
                                         Resolver
