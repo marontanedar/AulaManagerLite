@@ -33,7 +33,7 @@ class IncidenceController extends Controller
      */
     public function create()
     {
-        $resources = Resource::where('status', '!=', 3)->get();
+        $resources = Resource::where('status', '=', 1)->get(); // Solo envío los que están disponibles
         return view('incidences.create', compact('resources'));
     }
 
@@ -49,6 +49,19 @@ class IncidenceController extends Controller
             'resource_id' => 'required|exists:resources,resource_id',
             'description' => 'required|string',
         ]);
+
+        // No es necesario validar porque desde function create estoy enviando 1
+        // //Validar que no exista una incidencia de ese recurso
+        // $existResource = Incidence::where('resource_id', $request->resource_id)
+        //     ->where('status', false)
+        //     ->exists();
+
+        // if ($existResource) {
+        //     return back()->withErrors([
+        //         'resource_id' => 'Ya hay una incidencia para este recurso'
+        //     ])->withInput();
+        // }
+
 
         //Create incidence
         Incidence::create([
