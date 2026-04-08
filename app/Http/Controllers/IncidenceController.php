@@ -69,7 +69,7 @@ class IncidenceController extends Controller
             'user_id' => auth()-> id(),
             'description' => $request->description,
             'date_incidence' => now(),
-            'status' => false,
+            'status' => 1,
             'created_by' => auth()->id(),
         ]);
 
