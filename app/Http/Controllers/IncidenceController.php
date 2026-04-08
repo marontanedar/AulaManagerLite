@@ -63,7 +63,7 @@ class IncidenceController extends Controller
         $resource = Resource::find($request->resource_id);
         $resource->update(['status' => 2]);
 
-        return redirect()->back()->with('info', 'Incidencia reportada');
+        return redirect()->route('incidences.index')->with('info', 'Incidencia reportada');
     }
 
     /**
