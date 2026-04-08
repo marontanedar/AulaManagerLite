@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Incidence;
 use App\Models\Resource;
+use Illuminate\Support\Facades\Auth;
 
 class IncidenceController extends Controller
 {
@@ -15,7 +16,14 @@ class IncidenceController extends Controller
      */
     public function index()
     {
-        //
+        $incidences = Auth::user()->isAdmin()
+            ? Incidence::with(['resource', 'user'])->latest()->get()
+            : Incidence::with(['resource'])
+                ->where('user_id', Auth::id())
+                ->latest()
+                ->get();
+
+        return view('incidences.index', compact('incidences'));
     }
 
     /**
