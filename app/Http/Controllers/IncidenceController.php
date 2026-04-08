@@ -87,7 +87,14 @@ class IncidenceController extends Controller
      */
     public function show($id)
     {
-        //
+        $incidence = Incidence::with(['resource', 'user', 'updater'])->findOrFail($id);
+
+        // Profesor solo puede ver las suyas
+        if (!Auth::user()->isAdmin() && $incidence->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        return view('incidences.show', compact('incidence'));
     }
 
     /**
