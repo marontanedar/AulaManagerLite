@@ -23,7 +23,6 @@
                             <option value="{{ $resource->resource_id }}"
                                 {{ old('resource_id') == $resource->resource_id ? 'selected' : '' }}>
                                 {{ $resource->name }}
-                                @if($resource->status == 2) (en mantenimiento) @endif
                             </option>
                         @endforeach
                     </select>
