@@ -33,7 +33,8 @@ class IncidenceController extends Controller
      */
     public function create()
     {
-        //
+        $resources = Resource::where('status', '!=', 3)->get();
+        return view('incidences.create', compact('resources'));
     }
 
     /**
