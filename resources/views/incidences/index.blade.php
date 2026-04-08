@@ -36,8 +36,6 @@
                         <td class="fw-bold text-uppercase">{{ $incidence->resource->name ?? '—' }}</td>
                         @if(auth()->user()->isAdmin())
                             <td style="font-size:0.7rem;">{{ $incidence->user->name ?? '—' }}</td>
-                        ?->name ?? '—'
-                        ?```
                         @endif
                         <td style="font-size:0.7rem;">
                             {{ \Carbon\Carbon::parse($incidence->date_incidence)->format('d/m/Y H:i') }}
