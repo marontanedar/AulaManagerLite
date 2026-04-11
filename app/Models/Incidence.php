@@ -24,8 +24,8 @@ class Incidence extends Model
         'status'
     ];
 
-    protected $cast = [
-        'status'         => 'booleans',
+    protected $casts = [
+        'status'         => 'integer',
         'date_incidence' => 'datetime',
     ];
 
@@ -52,6 +52,6 @@ class Incidence extends Model
     // Usuario que actualiza un registro
     public function updater()
     {
-        return $this->belongsTo(User::class, 'created_by', 'user_id');
+        return $this->belongsTo(User::class, 'updated_by', 'user_id');
     }
 }
