@@ -46,7 +46,7 @@
                         <td class="text-center">
                             @if($incidence->status ==3)
                                 <span class="badge-status badge-disponible">● Resuelta</span>
-                            @else($incidence->status)
+                            @else
                                 <span class="badge-status badge-averiado">● Pendiente</span>
                             @endif
                         </td>
