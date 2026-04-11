@@ -5,6 +5,7 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\IncidenceController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,7 +20,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::redirect('/home', '/');
-Route::get('/audit', [AuditLogController::class, 'index'])->name('audit.index');
 
 //Sin autenticar usuario
 Route::middleware(['guest'])->group(function () {
@@ -59,7 +59,13 @@ Route::middleware(['auth'])->group(function () {
 
         // CRUD para Admin
         Route::resource('incidences', IncidenceController::class)->only([
-            'edit', 'update', 'destroy'
+            'edit','update'
         ]);
+
+        // CRUD para admin
+        Route::resource('categories', CategoryController::class);
+
+        // Audit
+        Route::get('/audit', [AuditLogController::class, 'index'])->name('audit.index');
     });
 });

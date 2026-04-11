@@ -256,6 +256,14 @@
                 </li>
                 @endif
 
+                @if(auth()->user()->isAdmin())
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">
+                        <i class="bi bi-exclamation-triangle me-1"></i>Categorías
+                    </a>
+                </li>
+                @endif
+
 
                 <li class="nav-item dropdown ms-1">
                     <button class="btn btn-outline-dark btn-sm dropdown-toggle px-3" data-bs-toggle="dropdown">
