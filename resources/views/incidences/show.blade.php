@@ -12,7 +12,7 @@
                     </p>
                 </div>
                 <div class="d-flex gap-2">
-                    @if(auth()->user()->isAdmin() && $incidence->status == 1)
+                    @if(auth()->user()->isAdmin() && $incidence->status != 3)
                         <a href="{{ route('incidences.edit', $incidence->incidence_id) }}"
                            class="btn btn-dark btn-sm">Resolver</a>
                     @endif
@@ -24,7 +24,7 @@
             <div class="mb-4 p-3 text-center"
                  style="background:{{ $incidence->status ? '#f0fff4' : '#fff5f5' }};
                         border:1.5px solid {{ $incidence->status ? '#198754' : '#dc3545' }};">
-                @if($incidence->status == 3)
+                @if($incidence->status == 3)  {{-- resuelta --}}
                     <span class="fw-bold" style="color:#198754; font-size:0.85rem;">
                         ● INCIDENCIA RESUELTA
                     </span>
