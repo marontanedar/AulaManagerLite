@@ -105,7 +105,8 @@ class IncidenceController extends Controller
      */
     public function edit($id)
     {
-        //
+        $incidence = Incidence::with(['resource', 'user'])->findOrFail($id);
+        return view('incidences.edit', compact('incidence'));
     }
 
     /**
@@ -115,9 +116,32 @@ class IncidenceController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Incidence $incidence)
     {
-        //
+        $request->validate([
+            'status' =>  'required|integer|in:1,3',
+        ]);
+
+        $incidence->update([
+            'status'     => $request->status,
+            'updated_by' => auth()->id(),
+        ]);
+
+        $resource = Resource::find($incidence->resource_id);
+        if ($resource) {
+             $resource->update(['status' => 1]);
+        }
+
+        // dd([
+        //     'request_status'    => $request->status,
+        //     'request_all'       => $request->all(),
+        //     'incidence_id'      => $incidence->incidence_id,
+        //     'incidence_status'  => $incidence->fresh()->status,  // recarga de BD
+        //     'updated_by'        => $incidence->fresh()->updated_by,
+        //     'resource_id'       => $incidence->resource_id,
+        // ]);
+
+        return redirect()->route('incidences.show', $incidence)->with(['success', 'Incidencia resuelta']);
     }
 
     /**
