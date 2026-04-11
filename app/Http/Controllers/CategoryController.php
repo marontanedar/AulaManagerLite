@@ -96,8 +96,14 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Category $category)
     {
-        //
+        if ($category->resources()->count() > 0) {
+            return redirect()->route('categories.index')->with('error', 'No se puede eliminar categoría con recursos asociados');
+        }
+
+        $category->delete();
+
+        return redirect()->route('categories.index')->with('success', 'Categoría elininada');
     }
 }
