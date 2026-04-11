@@ -23,6 +23,10 @@ class Resource extends Model
         'updated_by'
     ];
 
+    protected $casts = [
+        'status' => 'integer',
+    ];
+
     // Relaciones
 
     // Reservas de este recurso
