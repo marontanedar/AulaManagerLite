@@ -30,6 +30,7 @@ class CreateTableIncidences extends Migration
 
             $table->dateTime("date_incidence");
             $table->string("description");
+            $table->text('resolution_notes')->nullable();
             $table->tinyInteger("status")->default(1); //1: Pendiente, 3: Resuelta
 
             $table->timestamps();
