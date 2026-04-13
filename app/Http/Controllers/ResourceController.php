@@ -13,10 +13,21 @@ class ResourceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $resources = Resource::with(['category', 'creator'])->get();
-        return view('resources.index', compact('resources'));
+        $query = Resource::with(['category', 'creator']);
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $resources = $query->orderBy('name')->get();
+        $categories = Category::orderBy('name')->get();
+        return view('resources.index', compact('resources', 'categories'));
     }
 
     /**
@@ -26,7 +37,7 @@ class ResourceController extends Controller
      */
     public function create()
     {
-        $categories = Category::all();
+        $categories = Category::orderBy('name')->get();
         return view('resources.create', compact('categories'));
     }
 
@@ -42,6 +53,7 @@ class ResourceController extends Controller
             'name'        => 'required|string|max:50',
             'category_id' => 'required|exists:categories,category_id',
             'status'      => 'required|in:1,2,3',
+            'description' => 'nullable|string|max:500',
         ]);
 
         Resource::create([
@@ -63,11 +75,17 @@ class ResourceController extends Controller
      */
     public function show($id)
     {
-        // $resource = Resource::with('category', 'creator', 'incidences', 'reservations')
-        //             ->where('resource_id', $id)
-        //             ->findOrFail($id);
+        $resource = Resource::with([
+            'category',
+            'creator',
+            'incidences',
+            'reservations' => fn($q) => $q->where('date', '>=', today())
+                                         ->orderBy('date')
+                                         ->orderBy('start')
+                                         ->with('space', 'user'),
+        ])->findOrFail($id);
 
-        return redirect()->route('resources.edit', $id);
+        return view('resources.show', compact('resource'));
     }
 
     /**
@@ -79,7 +97,7 @@ class ResourceController extends Controller
     public function edit($id)
     {
         $resource = Resource::findOrFail($id);
-        $categories = Category::all();
+        $categories = Category::orderBy('name')->get();
         return view('resources.edit', compact("resource", 'categories'));
     }
 
@@ -96,13 +114,14 @@ class ResourceController extends Controller
             'name'        => 'required|string|max:255',
             'category_id' => 'required|exists:categories,category_id',
             'status'      => 'required|in:1,2,3',
+            'description' => 'nullable|string|max:500',
         ]);
 
         $resource = Resource::findOrFail($id);
 
         $resource->update([
-            'name'        => $request->name,
-            'description' => $request->description ?? '',
+            'name'        => trim($request->name),
+            'description' => $request->description,
             'category_id' => $request->category_id,
             'status'      => $request->status,
             'updated_by'  => auth()->id(),
@@ -120,6 +139,16 @@ class ResourceController extends Controller
     public function destroy($id)
     {
         $resource = Resource::findOrFail($id);
+
+        //Bloquear si tiene reservas futuras asignadas
+        $futuras = $resource->reservations()->count();
+
+        if ($futuras > 0) {
+            return back()->with(
+                'error',
+                "No se puede elimina \"{$resource->name}\" tiene {$futuras} reservas asignadas"
+            );
+        }
         $resource->delete();
 
         return redirect()->route('resources.index')->with('success', 'Recurso eliminado');
