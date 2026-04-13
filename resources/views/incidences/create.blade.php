@@ -15,8 +15,15 @@
             <form action="{{ route('incidences.store') }}" method="POST">
                 @csrf
 
-                <div class="mb-3">
-                    <label class="form-label-upper">Recurso afectado</label>
+            <div class="mb-3">
+                <label class="form-label-upper">Recurso afectado</label>
+                @if($resources->isEmpty())
+                    <div class="p-3 text-center text-muted"
+                        style="background:#f5f5f5; border:1.5px solid #ddd; font-size:0.8rem;">
+                        <i class="bi bi-check-circle me-1"></i>
+                        No hay recursos disponibles sin incidencia activa en este momento.
+                    </div>
+                @else
                     <select name="resource_id" class="form-select" required>
                         <option value="">Selecciona un recurso...</option>
                         @foreach($resources as $resource)
@@ -26,7 +33,11 @@
                             </option>
                         @endforeach
                     </select>
-                </div>
+                    @error('resource_id')
+                        <div class="text-danger mt-1" style="font-size:0.75rem;">{{ $message }}</div>
+                    @enderror
+                @endif
+            </div>
 
                 <div class="mb-4">
                     <label class="form-label-upper">Descripción del problema</label>

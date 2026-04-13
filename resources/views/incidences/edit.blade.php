@@ -29,11 +29,26 @@
                 <input type="hidden" name="status" value="3">
 
                 <div class="mb-4">
-                    <p class="form-label-upper mb-1">Acción</p>
-                    <div style="background:#f0fff4; border:1.5px solid #198754; padding:0.75rem; font-size:0.85rem;">
-                        Al confirmar, la incidencia se marcará como <strong>resuelta</strong>
-                        y el recurso volverá a estar <strong>disponible</strong>.
+                    <p class="form-label-upper mb-2">Cambiar estado</p>
+                    <div class="d-flex gap-3 p-2" style="background:#f5f5f5; border:1.5px solid #111;">
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" type="radio" name="status" id="s1" value="1"
+                                {{ $incidence->status == 1 ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold text-danger" style="font-size:0.7rem;" for="s1">
+                                ● Pendiente
+                            </label>
+                        </div>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" type="radio" name="status" id="s3" value="3"
+                                {{ $incidence->status == 3 ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold text-success" style="font-size:0.7rem;" for="s3">
+                                ● Resuelta
+                            </label>
+                        </div>
                     </div>
+                    <small class="text-muted" style="font-size:0.65rem;">
+                        Al marcar como resuelta, el recurso volverá automáticamente a disponible.
+                    </small>
                 </div>
 
                 <div class="d-flex gap-2 justify-content-end">
