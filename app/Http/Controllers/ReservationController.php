@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Space;
 use App\Models\Resource;
 use App\Models\Category;
 use App\Models\Reservation;
@@ -13,40 +14,59 @@ class ReservationController extends Controller
 {
     public function index(Request $request)
     {
-        $categories = Category::all();
-
+        // $categories = Category::all();
         $date = $request->get('date', date('Y-m-d'));
+        // $categoryId = $request->get('category');
 
         $hours = [];
-        $apertura = 8;
-        $cierre = 21;
-
-        for ($i = $apertura; $i <= $cierre; $i++) {
+        for ($i = 8; $i <= 21; $i++) {
             $hours[] = sprintf('%02d:00', $i);
         }
 
-        $resources = Resource::with(['reservations' => function ($q) use ($date) {
-            $q->where('date', $date);
+        // Se muestran todos los espacios disponibles
+        $spaces = Space::with(['category', 'reservations' => function ($q) use ($date) {
+                $q->where('date', $date)->with('user');
         }])
-        ->when($request->category, function ($q, $categoryId) {
-            return $q->where('category_id', $categoryId);
-        })
-        ->get();
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get();
 
-        return view('reservations.index', compact('categories', 'hours', 'resources', 'date'));
+        $selectedSpace = null;
+        if ($request->has('space')) {
+            $selectedSpace = Space::with([
+                'category',
+                'reservations' => fn($q) => $q->where('date', $date)->with(['user', 'resources']),
+            ])->find($request->get('space'));
+        }
+
+        $resources = Resource::where('status', 1)
+            ->with('category')
+            ->orderBy('name')
+            ->get();
+
+        return view('reservations.index', compact(
+            'hours',
+            'spaces',
+            'resources',
+            'date',
+            'selectedSpace'
+        ));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'resource_id'  => 'required|exists:resources,resource_id',
-            'date'         => 'required|date',
-            'start'        => 'required|date_format:H:i', // Formato H:i desde el modal
-            'end'          => 'required|date_format:H:i|after:start',
+            'space_id'       => 'required|exists:spaces,space_id',
+            'date'           => 'required|date',
+            'start'          => 'required|date_format:H:i',
+            'end'            => 'required|date_format:H:i|after:start',
+            'notes'          => 'nullable|string|max:500',
+            'resource_ids'   => 'nullable|array',
+            'resource_ids.*' => 'exists:resources,resource_id',
         ]);
 
-        // Validación de solapamiento (Overlap)
-         $exists = Reservation::where('resource_id', $request->resource_id)
+        // Validación de solapamiento
+        $exists = Reservation::where('space_id', $request->space_id)
             ->where('date', $request->date)
             ->where(function ($q) use ($request) {
                 $q->where('start', '<', $request->end)
@@ -58,18 +78,23 @@ class ReservationController extends Controller
         }
 
         $reservation = Reservation::create([
-            'user_id'     => auth()->id(),
-            'resource_id' => $request->resource_id,
-            'date'        => $request->date,
-            'start'       => $request->start,
-            'end'         => $request->end,
+            'user_id'  => Auth::id(),
+            'space_id' => $request->space_id,
+            'date'     => $request->date,
+            'start'    => $request->start,
+            'end'      => $request->end,
+            'notes'    => $request->notes,
         ]);
+
+        if ($request->filled('resource_ids')) {
+            $reservation->resources()->attach($request->resource_ids);
+        }
 
         AuditLog::record(
             'reserved',
             'Reservation',
             $reservation->reservation_id,
-            'Reserva de ' . $reservation->resource->name . ' el ' . $reservation->date
+            'Reserva de ' . $reservation->space->name . ' el ' . $reservation->date
         );
 
         return back()->with('success', '¡Reserva guardada con éxito!');
@@ -77,21 +102,25 @@ class ReservationController extends Controller
 
     public function myReservations()
     {
-        // if (!Auth::check()) {
-        //     return redirect()->route('login');
-        // }
-        $reservations = Auth::user()->reservations()->with('resource')->orderBy('date', 'desc')->get();
+        $reservations = Auth::user()->reservations()
+            ->with(['space', 'space.category', 'resources'])
+            ->where('date', '>=', today()) // ← solo presentes y futuras
+            ->orderBy('date', 'asc')
+            ->orderBy('start', 'asc')
+            ->get();
+
         return view('reservations.my_reservations', compact('reservations'));
     }
 
     public function destroy(Reservation $reservation)
     {
-        if ($reservation->user_id !== Auth::id()) {
-            return back()->withErrors(['msg' => 'Sin permisos para cancelar esta reserva']);
+        if ($reservation->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+            return back()->withErrors(['msg' => 'Sin permisos para cancelar esta reserva.']);
         }
 
+        $reservation->resources()->detach();
         $reservation->delete();
 
-        return back()->with('success', 'Reserva cancelada');
+        return back()->with('success', 'Reserva cancelada.');
     }
 }

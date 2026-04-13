@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\IncidenceController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SpaceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,6 +54,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Rutas de administradores
     Route::middleware('admin')->group(function () {
+
+        Route::resource('spaces', SpaceController::class);
 
         // CRUD para Admin
         Route::resource('resources', ResourceController::class);

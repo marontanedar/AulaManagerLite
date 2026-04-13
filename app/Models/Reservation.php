@@ -15,6 +15,7 @@ class Reservation extends Model
     protected $primaryKey = 'reservation_id';
 
     protected $fillable = [
+        'space_id',
         'user_id',
         'resource_id',
         'date',
@@ -33,8 +34,19 @@ class Reservation extends Model
     }
 
     // Recurso reservado
-    public function resource()
+    public function resources()
     {
-        return $this->belongsTo(Resource::class, 'resource_id', 'resource_id');
+        return $this->belongsToMany(
+            Resource::class,
+            'reservation_resource',
+            'reservation_id',
+            'resource_id'
+        );
+    }
+
+    //
+    public function space()
+    {
+        return $this->belongsTo(Space::class, 'space_id', 'space_id');
     }
 }

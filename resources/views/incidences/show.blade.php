@@ -21,18 +21,19 @@
             </div>
 
             {{-- Estado destacado --}}
+            @php
+                $resuelta = $incidence->status == 3;
+                $bgColor     = $resuelta ? '#f0fff4' : '#fff5f5';
+                $borderColor = $resuelta ? '#198754' : '#dc3545';
+                $textColor   = $resuelta ? '#198754' : '#dc3545';
+                $label       = $resuelta ? '● INCIDENCIA RESUELTA' : '● INCIDENCIA PENDIENTE DE RESOLUCIÓN';
+            @endphp
+
             <div class="mb-4 p-3 text-center"
-                 style="background:{{ $incidence->status ? '#f0fff4' : '#fff5f5' }};
-                        border:1.5px solid {{ $incidence->status ? '#198754' : '#dc3545' }};">
-                @if($incidence->status == 3)  {{-- resuelta --}}
-                    <span class="fw-bold" style="color:#198754; font-size:0.85rem;">
-                        ● INCIDENCIA RESUELTA
-                    </span>
-                @else
-                    <span class="fw-bold" style="color:#dc3545; font-size:0.85rem;">
-                        ● INCIDENCIA PENDIENTE DE RESOLUCIÓN
-                    </span>
-                @endif
+                style="background:{{ $bgColor }}; border:1.5px solid {{ $borderColor }};">
+                <span class="fw-bold" style="color:{{ $textColor }}; font-size:0.85rem;">
+                    {{ $label }}
+                </span>
             </div>
 
             {{-- Info en grid --}}
@@ -43,17 +44,21 @@
                         {{ $incidence->resource->name ?? '—' }}
                     </span>
                 </div>
+
                 <div class="col-6 col-md-3">
                     <p class="form-label-upper mb-1">Estado del recurso</p>
-                    @php $status = $incidence->resource->status ?? null; @endphp
-                    @if($status == 1)
+                    @php $rStatus = $incidence->resource->status ?? null; @endphp
+                    @if($rStatus == 1)
                         <span class="badge-status badge-disponible">● Disponible</span>
-                    @elseif($status == 2)
+                    @elseif($rStatus == 2)
                         <span class="badge-status badge-mantenimiento">● Mantenimiento</span>
-                    @else
+                    @elseif($rStatus == 3)
                         <span class="badge-status badge-averiado">● Fuera de servicio</span>
+                    @else
+                        <span class="text-muted" style="font-size:0.75rem;">—</span>
                     @endif
                 </div>
+                
                 <div class="col-6 col-md-3">
                     <p class="form-label-upper mb-1">Reportado por</p>
                     <span style="font-size:0.8rem;">{{ $incidence->user->name ?? '—' }}</span>

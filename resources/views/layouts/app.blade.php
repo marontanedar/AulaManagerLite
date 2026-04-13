@@ -52,7 +52,7 @@
         }
 
         .navbar-brand img {
-            height: 50px;
+            height: 70px;
             width: auto;
         }
 
@@ -203,7 +203,7 @@
         /* ── Responsive ajustes ── */
         @media (max-width: 768px) {
             .navbar { min-height: 56px; padding: 0.3rem 1rem; }
-            .navbar-brand img { height: 36px; }
+            .navbar-brand img { height: 48px; }
             .nav-link { font-size: 0.6rem; padding: 4px 8px !important; }
             .card-panel { padding: 0.85rem; }
             .section-title { font-size: var(--fs-base); }
@@ -228,6 +228,15 @@
                         <i class="bi bi-calendar3 me-1"></i>Inicio
                     </a>
                 </li>
+                
+                @if(auth()->user()->isAdmin())
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('spaces.*') ? 'active' : '' }}" href="{{ route('spaces.index') }}">
+                        <i class="bi bi-door-open me-1"></i>Espacios
+                    </a>
+                </li>
+                @endif
+
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('reservations.user') ? 'active' : '' }}" href="{{ route('reservations.user') }}">
                         <i class="bi bi-bookmark me-1"></i>Mis Reservas
@@ -251,7 +260,7 @@
                 @if(auth()->user()->isAdmin())
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('audit.*') ? 'active' : '' }}" href="{{ route('audit.index') }}">
-                        <i class="bi bi-exclamation-triangle me-1"></i>Auditoria
+                        <i class="bi bi-shield-check me-1"></i>Auditoria
                     </a>
                 </li>
                 @endif
@@ -293,6 +302,12 @@
         @if(session('success'))
             <div class="alert alert-success border-success mb-3">
                 <i class="bi bi-check-circle me-1"></i>{{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-success border-success mb-3">
+                <i class="bi bi-exclamation-circle me-1"></i>{{ session('error') }}
             </div>
         @endif
 

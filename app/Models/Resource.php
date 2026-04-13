@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Resource extends Model
 {
@@ -32,7 +33,12 @@ class Resource extends Model
     // Reservas de este recurso
     public function reservations()
     {
-        return $this->hasMany(Reservation::class, 'resource_id', 'resource_id');
+        return $this->belongsToMany(
+            Reservation::class,
+            'reservation_resource',
+            'resource_id',
+            'reservation_id'
+        );
     }
 
     // Recurso pertenece a categoría
