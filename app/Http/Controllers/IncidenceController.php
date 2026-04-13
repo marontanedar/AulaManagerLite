@@ -14,14 +14,18 @@ class IncidenceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $incidences = Auth::user()->isAdmin()
-            ? Incidence::with(['resource', 'user'])->latest()->get()
+        $query = Auth::user()->isAdmin()
+            ? Incidence::with(['resource', 'user'])
             : Incidence::with(['resource'])
-                ->where('user_id', Auth::id())
-                ->latest()
-                ->get();
+                ->where('user_id', Auth::id());
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $incidences = $query->latest()->get();
 
         return view('incidences.index', compact('incidences'));
     }
@@ -33,7 +37,7 @@ class IncidenceController extends Controller
      */
     public function create()
     {
-        $resources = Resource::where('status', '=', 1)->get(); // Solo envío los que están disponibles
+        $resources = Resource::where('status', 1)->orderBy('name')->get(); // Solo envío los que están disponibles
         return view('incidences.create', compact('resources'));
     }
 
@@ -50,17 +54,23 @@ class IncidenceController extends Controller
             'description' => 'required|string',
         ]);
 
-        // No es necesario validar porque desde function create estoy enviando 1
-        // //Validar que no exista una incidencia de ese recurso
-        // $existResource = Incidence::where('resource_id', $request->resource_id)
-        //     ->where('status', false)
-        //     ->exists();
+        $resource = Resource::findOrFail($request->resource_id);
+        if ($resource->status !== 1) {
+            return back()->withErrors([
+                'resource_id' => 'No disponilbe'
+            ])->withInput();
+        }
 
-        // if ($existResource) {
-        //     return back()->withErrors([
-        //         'resource_id' => 'Ya hay una incidencia para este recurso'
-        //     ])->withInput();
-        // }
+        // Validar que no exista una incidencia de ese recurso
+        $existResource = Incidence::where('resource_id', $request->resource_id)
+            ->where('status', 1)
+            ->exists();
+
+        if ($existResource) {
+            return back()->withErrors([
+                'resource_id' => 'Ya hay una incidencia para este recurso'
+            ])->withInput();
+        }
 
 
         //Create incidence
@@ -73,7 +83,6 @@ class IncidenceController extends Controller
             'created_by' => auth()->id(),
         ]);
 
-        $resource = Resource::find($request->resource_id);
         $resource->update(['status' => 2]);
 
         return redirect()->route('incidences.index')->with('info', 'Incidencia reportada');
@@ -120,16 +129,17 @@ class IncidenceController extends Controller
     {
         $request->validate([
             'status' =>  'required|integer|in:1,3',
+            'resolution_notes' => 'nullable|string|max:500',
         ]);
 
         $incidence->update([
             'status'     => $request->status,
+            'resolution_notes' => $request->resolution_notes,
             'updated_by' => auth()->id(),
         ]);
 
-        $resource = Resource::find($incidence->resource_id);
-        if ($resource) {
-             $resource->update(['status' => 1]);
+        if ($request->status == 3 && $incidence->resource) {
+            $incidence->resource->update(['status' => 1]);
         }
 
         // dd([
